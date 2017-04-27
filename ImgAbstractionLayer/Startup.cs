@@ -36,6 +36,10 @@ namespace ImgAbstractionLayer
 
             services.AddDbContext<SearchContext>();
 
+            services.AddScoped<ISearchRepository, SearchRepository>();
+
+            services.AddTransient<SearchContextSeedData>();
+
             services.AddMvc()
                 .AddJsonOptions(options =>
                 {
@@ -47,7 +51,8 @@ namespace ImgAbstractionLayer
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env,
+            ILoggerFactory loggerFactory, SearchContextSeedData seeder)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
@@ -70,6 +75,9 @@ namespace ImgAbstractionLayer
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            //Ensures there is available data in the database
+            seeder.EnsureSeedData().Wait();
         }
     }
 }
