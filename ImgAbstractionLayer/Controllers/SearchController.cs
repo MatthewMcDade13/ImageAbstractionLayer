@@ -1,13 +1,8 @@
 ﻿using ImgAbstractionLayer.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
-using System.Reflection;
-using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
 using ImgAbstractionLayer.Services;
 
@@ -24,6 +19,15 @@ namespace ImgAbstractionLayer.Controllers
             this.parser = parser;
             this.repo = repo;
         }
+
+
+        //GET api/imagesearch/recent
+        [HttpGet("recent")]
+        public IActionResult GetRecentSearches()
+        {
+            return Json(repo.GetRecentSearchesJson());
+        }
+
 
         [HttpGet("{term:alpha}")]
         public async Task<IActionResult> SearchImages(string term)
@@ -60,22 +64,7 @@ namespace ImgAbstractionLayer.Controllers
             }
         }
 
-        [HttpGet("test/{test:alpha}")]
-        public IActionResult Test(string test)
-        {
-            string query = Request.QueryString.ToString();
-            
-
-            return Json(new { Query = query, TestString = test , Param = Request.Query["a"].ToString() });
-        }
-
-        //GET api/imagesearch/recent
-        [HttpGet("recent")]
-        public IActionResult GetRecentSearches()
-        {
-            return Json(repo.GetRecentSearchesJson());
-        }
-
+        
         private async Task AddSearchToDb(string term)
         {
             repo.AddSearch(new Search
