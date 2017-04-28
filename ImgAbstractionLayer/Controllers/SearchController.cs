@@ -20,6 +20,14 @@ namespace ImgAbstractionLayer.Controllers
             this.repo = repo;
         }
 
+        [HttpGet]
+        public void ThrowError()
+        {
+            //No arguments were provided for api call, so throw an exception 
+            //(user will get rerouted to user error page)
+            throw new ArgumentException("No arguments provided for API call");
+        }
+
 
         //GET api/imagesearch/recent
         [HttpGet("recent")]
@@ -29,7 +37,7 @@ namespace ImgAbstractionLayer.Controllers
         }
 
 
-        [HttpGet("{term:alpha}")]
+        [HttpGet("{term}")]
         public async Task<IActionResult> SearchImages(string term)
         {
             await AddSearchToDb(term);
