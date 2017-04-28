@@ -10,6 +10,8 @@ namespace ImgAbstractionLayer.Models
     {
         IEnumerable<Search> GetAllSearches();
 
+        IEnumerable<Search> GetRecentSearches();
+
         void AddSearch(Search search);
 
         Task<bool> SaveChangesAsync();
