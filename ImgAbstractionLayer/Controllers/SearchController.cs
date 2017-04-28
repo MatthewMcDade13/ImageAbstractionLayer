@@ -6,8 +6,10 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
+using ImgAbstractionLayer.Services;
 
 namespace ImgAbstractionLayer.Controllers
 {
@@ -15,28 +17,56 @@ namespace ImgAbstractionLayer.Controllers
     public class SearchController : Controller
     {
         private ISearchRepository repo;
+        private IApiParser parser;
 
-        public SearchController(ISearchRepository repo)
+        public SearchController(ISearchRepository repo, IApiParser parser)
         {
+            this.parser = parser;
             this.repo = repo;
         }
 
         [HttpGet("{term:alpha}")]
         public async Task<IActionResult> SearchImages(string term)
         {
+            int offset = 0;
+
             using (HttpClient client = new HttpClient())
             {
-                using (HttpResponseMessage response = await client.GetAsync("https://wind-bow.glitch.me/twitch-api/channels/classypax"))
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", "dcd10e0a6efe49ab9fe4f5e1ddd459a5");
+                
+
+                try
+                {
+                    offset = int.Parse(Request.Query["offset"].ToString());
+                }
+                catch (FormatException)
+                {
+                    //Use value assigned at initilization
+                }
+
+                using (HttpResponseMessage response =
+                    await client.GetAsync($"https://api.cognitive.microsoft.com/bing/v5.0/images/search?q={term}&offset={offset}"))
                 {
                     response.EnsureSuccessStatusCode();
 
                     string jsonString = await response.Content.ReadAsStringAsync();
 
-                    Object json = JsonConvert.DeserializeObject(jsonString);
+                    dynamic json = JsonConvert.DeserializeObject(jsonString);
+
+                    json = parser.ParseApi(json);
 
                     return Json(json);
                 }
             }
+        }
+
+        [HttpGet("test/{test:alpha}")]
+        public IActionResult Test(string test)
+        {
+            string query = Request.QueryString.ToString();
+            
+
+            return Json(new { Query = query, TestString = test , Param = Request.Query["a"].ToString() });
         }
 
         //GET api/imagesearch/recent

@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ImgAbstractionLayer.Models;
 using Newtonsoft.Json.Serialization;
+using ImgAbstractionLayer.Services;
 
 namespace ImgAbstractionLayer
 {
@@ -39,6 +40,8 @@ namespace ImgAbstractionLayer
             services.AddScoped<ISearchRepository, SearchRepository>();
 
             services.AddTransient<SearchContextSeedData>();
+
+            services.AddScoped<IApiParser, ApiParser>();
 
             services.AddMvc()
                 .AddJsonOptions(options =>
