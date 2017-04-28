@@ -28,13 +28,13 @@ namespace ImgAbstractionLayer.Controllers
         [HttpGet("{term:alpha}")]
         public async Task<IActionResult> SearchImages(string term)
         {
+            await AddSearchToDb(term);
             int offset = 0;
 
             using (HttpClient client = new HttpClient())
             {
                 client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", "dcd10e0a6efe49ab9fe4f5e1ddd459a5");
-                
-
+               
                 try
                 {
                     offset = int.Parse(Request.Query["offset"].ToString());
@@ -73,9 +73,18 @@ namespace ImgAbstractionLayer.Controllers
         [HttpGet("recent")]
         public IActionResult GetRecentSearches()
         {
-
-            //var test = repo.GetRecentSearches().ToArray();
             return Json(repo.GetRecentSearchesJson());
+        }
+
+        private async Task AddSearchToDb(string term)
+        {
+            repo.AddSearch(new Search
+            {
+                SearchTerm = term,
+                SearchTime = DateTime.UtcNow
+            });
+
+            await repo.SaveChangesAsync();
         }
     }
 }

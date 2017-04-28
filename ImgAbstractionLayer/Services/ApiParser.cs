@@ -12,7 +12,7 @@ namespace ImgAbstractionLayer.Services
         {
             List<dynamic> searchList = new List<dynamic>();
 
-
+            //Only give us the first 10 search results
             for (int i = 0; i < 10; i++)
             {
                 searchList.Add(
